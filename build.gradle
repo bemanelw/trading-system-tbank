@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.10'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.chernyugov.trading'
@@ -28,15 +28,44 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework:spring-aspects:6.1.5'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.springframework.retry:spring-retry:2.0.5'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.3'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+	testCompileOnly 'org.projectlombok:lombok:1.18.30'
+
+	//tbank
+	implementation 'ru.tinkoff.piapi:java-sdk-core:1.5'
+	implementation 'io.grpc:grpc-api:1.43.0'
+	implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+	implementation 'io.reactivex.rxjava3:rxjava:3.0.9'
+	implementation 'org.reactivestreams:reactive-streams:1.0.3'
+	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+
+	compileOnly 'org.projectlombok:lombok:1.18.30'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+}
+
+bootBuildImage {
+	imageName = "chernyugov-invest:latest"
+}
+
+bootRun {
+	systemProperties = System.properties
 }
