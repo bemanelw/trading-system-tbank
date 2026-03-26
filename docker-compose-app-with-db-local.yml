@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  chernyugov-trading-bot-db:
+    image: 'postgres:14.1-alpine'
+    container_name: chernyugov-trading-bot-db
+    volumes:
+      - ./postgresql:/var/lib/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+
+
+  tinkoff-trading-robot:
+    image: 'chernyugov/trading:latest'
+    container_name: chernyugov-trading-bot
+    depends_on:
+      - chernyugov-trading-bot-db
+    ports:
+      - 10000:10000
+    environment:
+      - spring.datasource.url=jdbc:postgresql://chernyugov-trading-bot-db:5432/postgres
+      - spring.datasource.username=postgres
+      - spring.datasource.password=1234
+      - candle.listener.enabled=true
+      - tinkoff.emulator=false
+      - tinkoff.is-token-sandbox=true
+      - tinkoff.token=t.50qS2BllZykHKgTuyKficSFACgXZLGlMhHcY2BbF8wN9hLqeBGP_9xhdYjgcQVV37bQDpodCCd_hNckwIbO_8g
+      - tinkoff.account-id=bc8ba504-bc5a-4d42-8d28-fe88eb51c8b2 #песочница
+
