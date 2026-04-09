@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/general.html :: head}"/>
+<body>
+<nav th:replace="~{fragments/general.html :: sidebar}"/>
+<div class="main-content">
+    <div class="page-title">Доходность: парный трейдинг</div>
+    <div class="page-sub">Результаты стратегий арбитража между инструментами, без учета комиссий</div>
+
+    <div class="tbl-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Стратегия</th>
+                <th>Дата старта</th>
+                <th>Начальный объем</th>
+                <th>Текущий объем</th>
+                <th>Доход, %</th>
+                <th>Сделок</th>
+                <th>Комиссия</th>
+                <th>Дней</th>
+            </tr>
+            </thead>
+            <tbody id="instr-vs-instr-table">
+            <tr th:each="r: ${reportInstrumentByInstrument}" th:style="${!r.strategyIsEnabled} ? 'opacity: 0.5'">
+                <td style="font-weight:500">
+                    <span th:text="${r.strategyName}"/>
+                    <span class="badge-status badge-on" style="margin-left:6px" th:if="${r.strategyIsEnabled}">on</span>
+                    <span class="badge-status badge-off" style="margin-left:6px" th:if="${!r.strategyIsEnabled}">off</span>
+                </td>
+                <td th:text="${#temporals.formatISO(r.initDate)}"/>
+                <td th:text="${#numbers.formatDecimal(r.initAmount, 1, 2, 'DEFAULT') + ' ' + r.initFigiTitle}"/>
+                <td th:text="${#numbers.formatDecimal(r.lastAmount, 1, 2, 'DEFAULT') + ' ' + r.lastFigiTitle}"/>
+                <td style="font-weight:500"
+                    th:classappend="${r.percent >= 0} ? 'text-pos' : 'text-neg'"
+                    th:text="${(r.percent >= 0 ? '+' : '') + #numbers.formatDecimal(r.percent, 1, 2, 'DEFAULT')}"/>
+                <td th:text="${r.orders}"/>
+                <td th:text="${#numbers.formatDecimal(r.commission, 1, 2, 'DEFAULT') + ' RUB'}"/>
+                <td th:text="${r.duration.toDays()}"/>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $('#instr-vs-instr-table td:nth-child(2)').each(function () {
+        var dateString = $(this).text();
+        if (dateString) {
+            var date = new Date(dateString);
+            $(this).text(date.toLocaleString([], {dateStyle: "short", timeStyle: 'short'}));
+        }
+    });
+</script>
+</body>
+</html>

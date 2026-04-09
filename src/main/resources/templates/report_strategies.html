@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/general.html :: head}"/>
+<body>
+<nav th:replace="~{fragments/general.html :: sidebar}"/>
+<div class="main-content">
+    <div class="page-title">Торговые стратегии</div>
+    <div class="page-sub">Настроенные стратегии и их параметры</div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-label">Всего стратегий</div>
+            <div class="stat-value" th:text="${#lists.size(reportStrategiesInfo)}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Активных</div>
+            <div class="stat-value pos" th:text="${#lists.size(reportStrategiesInfo.?[isEnabled])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Тип: за фиат</div>
+            <div class="stat-value" th:text="${#lists.size(reportStrategiesInfo.?[type == 'Инструмент за фиат'])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Тип: арбитраж</div>
+            <div class="stat-value" th:text="${#lists.size(reportStrategiesInfo.?[type == 'Инструмент за инструмент'])}">0</div>
+        </div>
+    </div>
+
+    <div class="tbl-wrap">
+        <table id="strategies-table">
+            <thead>
+            <tr>
+                <th>Стратегия</th>
+                <th>Тип</th>
+                <th>Инструменты</th>
+                <th>Условия</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s: ${reportStrategiesInfo}" th:style="${!s.isEnabled} ? 'opacity: 0.5'">
+                <td style="font-weight: 500;" th:text="${s.name}"/>
+                <td th:text="${s.type}"/>
+                <td>
+                    <span class="tag" th:each="e: ${s.figies}" th:text="${e.key + ' x' + e.value}"/>
+                </td>
+                <td class="criteria-block">
+                    <div th:if="${s.buyCriteria != null}">
+                        Покупка: ниже <span th:text="${s.buyCriteria.lessThenPercentile}"/>-го перцентиля
+                    </div>
+                    <div th:if="${s.sellCriteria != null && s.sellCriteria.takeProfitPercent != null}">
+                        Прибыль: +<span th:text="${s.sellCriteria.takeProfitPercent}"/>%
+                    </div>
+                    <div th:if="${s.sellCriteria != null && s.sellCriteria.stopLossPercent != null}">
+                        Убыток: -<span th:text="${s.sellCriteria.stopLossPercent}"/>%
+                    </div>
+                    <div th:if="${s.sellCriteria != null && s.sellCriteria.takeProfitPercentile != null}">
+                        Рост, перцентиль: <span th:text="${s.sellCriteria.takeProfitPercentile}"/>
+                    </div>
+                    <div th:if="${s.sellCriteria != null && s.sellCriteria.stopLossPercentile != null}">
+                        Падение, перцентиль: <span th:text="${s.sellCriteria.stopLossPercentile}"/>
+                    </div>
+                    <div th:if="${s.history != null}">
+                        Период: <span th:text="${s.history.toDays()}"/> дней
+                    </div>
+                    <div th:if="${s.dropPercent != null}">
+                        Переложить при: <span th:text="${s.dropPercent}"/>%
+                    </div>
+                </td>
+                <td>
+                    <span class="badge-status badge-on" th:if="${s.isEnabled && !s.isOnlySell}">Активна</span>
+                    <span class="badge-status badge-off" th:if="${!s.isEnabled}">Выключена</span>
+                    <span class="badge-status" style="background:rgba(245,158,11,0.15);color:var(--amber);" th:if="${s.isEnabled && s.isOnlySell}">Только продажа</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
