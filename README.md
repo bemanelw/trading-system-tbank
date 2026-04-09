@@ -161,16 +161,10 @@ JPYbyCNYByEURByGBPStrategy | init amount 1000.00 Иена             | last amo
 По коммиту, проект собирается с помощью github actions и docker образы публикуются в https://hub.docker.com/repository/docker/chernyugov/invest.
 Экземпляр приложения разворачивается на сервере c помощью GitHub Actions.
 
-На данный момент торгуются несколько стратегий, которые обгоняют рынок.
-Актуальное состояние можно посмотреть:
-- Sandbox 1: https://invest-sandbox.struchev.site (песочница, акции, **ветка sandbox**)
-- Sandbox 2: https://invest-sandbox-2.struchev.site (песочница, арбитраж валюты, **ветка sandbox-2**)
-- Live: https://invest.struchev.site (боевые стратегии, ветка master)
+На данный момент торгуются несколько стратегий.
 
 # Мониторинг приложения
 Подключен Spring Actuator. По умолчанию открыты:
 - `/actuator/metrics`
 - `/actuator/prometheus`
 
-# Статистика по брокерскому счету
-Для отображения детальной статистики по любому из брокерских счетов разработан отдельный сервис https://invest-stats.struchev.site
