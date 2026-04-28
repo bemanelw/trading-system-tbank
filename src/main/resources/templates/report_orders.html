@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/general.html :: head}"/>
+<body>
+<nav th:replace="~{fragments/general.html :: sidebar}"/>
+<div class="main-content">
+    <div class="page-title">Журнал операций</div>
+    <div class="page-sub">История всех покупок и продаж по стратегиям</div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-label">Всего сделок</div>
+            <div class="stat-value" th:text="${#lists.size(orders)}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Закрытых</div>
+            <div class="stat-value" th:text="${#lists.size(orders.?[sellDateTime != null])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Открытых</div>
+            <div class="stat-value" style="color: var(--amber);" th:text="${#lists.size(orders.?[sellDateTime == null])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Стратегий</div>
+            <div class="stat-value" th:text="${#sets.size(orders.![strategy])}">0</div>
+        </div>
+    </div>
+
+    <div class="tbl-wrap">
+        <table id="orders-table" style="width:100%">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Инструмент</th>
+                <th>Стратегия</th>
+                <th>Покупка</th>
+                <th>Цена покупки</th>
+                <th>Лоты</th>
+                <th>Цена продажи</th>
+                <th>Продажа</th>
+                <th>Комиссия</th>
+                <th>Прибыль</th>
+            </tr>
+            </thead>
+            <tbody id="orders-table-body">
+            <tr th:each="o: ${orders}">
+                <td th:text="${o.id}"/>
+                <td style="font-weight:500" th:text="${o.figiTitle}"/>
+                <td th:text="${o.strategy}"/>
+                <td th:text="${#temporals.formatISO(o.purchaseDateTime)}"/>
+                <td th:text="${#numbers.formatDecimal(o.purchasePrice, 1, 4, 'DEFAULT')}"
+                    data-toggle="tooltip" data-placement="top" th:title="${o.details?.currentPrices}"/>
+                <td th:text="${o.lots}"/>
+                <td th:text="${o.sellPrice == null ? '—' : #numbers.formatDecimal(o.sellPrice, 1, 4, 'DEFAULT')}"
+                    data-toggle="tooltip" data-placement="top" th:title="${o.details?.sellPrices}"/>
+                <td th:text="${o.sellDateTime == null ? '—' : #temporals.formatISO(o.sellDateTime)}"/>
+                <td th:text="${#numbers.formatDecimal(o.purchaseCommission.add(o.sellCommission == null ? 0 : o.sellCommission), 1, 2, 'DEFAULT')}"/>
+                <td>
+                    <span th:if="${o.sellPrice != null && o.purchaseCommission != null && o.sellCommission != null}"
+                          th:with="profit=${o.sellPrice.subtract(o.purchasePrice).multiply(o.lots).subtract(o.purchaseCommission).subtract(o.sellCommission)}"
+                          th:text="${#numbers.formatDecimal(profit, 1, 2, 'DEFAULT')}"
+                          th:classappend="${profit >= 0} ? 'text-pos' : 'text-neg'"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        new DataTable('#orders-table', {
+            pageLength: 50,
+            lengthChange: false,
+            info: false,
+            order: [[0, "desc"]],
+            language: {
+                search: "Поиск:",
+                paginate: { previous: "←", next: "→" }
+            }
+        });
+    });
+    $('#orders-table-body td:nth-child(4), #orders-table-body td:nth-child(8)').each(function () {
+        var dateString = $(this).text();
+        if (dateString && dateString !== '—') {
+            var date = new Date(dateString);
+            $(this).text(date.toLocaleString([], {dateStyle: "short", timeStyle: 'short'}));
+        }
+    });
+</script>
+</body>
+</html>

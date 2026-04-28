@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <title>T-Bank Trading System</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
+    <link rel="icon" href="/favicon.ico">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --bg2: #1a1d27;
+            --bg3: #232734;
+            --border: #2d3244;
+            --text: #e4e6ed;
+            --text2: #8b8fa3;
+            --accent: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
+            --amber: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+        .sidebar { width: 230px; background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { padding: 0 20px 28px; font-size: 16px; font-weight: 600; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; }
+        .sidebar-logo:hover { color: var(--text); }
+        .logo-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; flex-shrink: 0; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; font-size: 14px; color: var(--text2); text-decoration: none; border-left: 3px solid transparent; transition: all 0.15s; }
+        .nav-item:hover { color: var(--text); background: var(--bg3); text-decoration: none; }
+        .nav-item.active { color: var(--text); background: var(--bg3); border-left-color: var(--accent); }
+        .nav-icon { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+        .sidebar-footer { padding: 20px; font-size: 12px; color: var(--text2); position: absolute; bottom: 0; left: 0; right: 0; }
+        .main-content { margin-left: 230px; flex: 1; padding: 28px 32px; min-height: 100vh; }
+        .page-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.3px; }
+        .page-sub { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+        .stat-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
+        .stat-card { background: var(--bg2); border-radius: 10px; padding: 16px 18px; border: 1px solid var(--border); }
+        .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+        .stat-value { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+        .stat-value.pos { color: var(--green); }
+        .stat-value.neg { color: var(--red); }
+        .tbl-wrap { background: var(--bg2); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; }
+        .tbl-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0; }
+        .tbl-wrap thead th { text-align: left; padding: 12px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); font-weight: 500; border-bottom: 1px solid var(--border); background: transparent; white-space: nowrap; }
+        .tbl-wrap tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .tbl-wrap tbody tr:hover { background: var(--bg3); }
+        .tbl-wrap tbody tr:last-child td { border-bottom: none; }
+        .badge-status { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 500; }
+        .badge-on { background: rgba(34,197,94,0.15); color: var(--green); }
+        .badge-off { background: rgba(139,143,163,0.12); color: var(--text2); }
+        .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; background: var(--bg3); color: var(--text2); margin: 1px 2px; }
+        .text-pos { color: var(--green); }
+        .text-neg { color: var(--red); }
+        .text-muted2 { color: var(--text2); }
+        .criteria-block { font-size: 12px; line-height: 1.6; }
+        .criteria-block span { color: var(--text); }
+        /* DataTables overrides for dark theme */
+        .dataTables_wrapper .dataTables_filter input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 5px 10px; }
+        .dataTables_wrapper .dataTables_filter label { color: var(--text2); font-size: 13px; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button { color: var(--text2) !important; background: transparent !important; border: 1px solid var(--border) !important; border-radius: 4px; margin: 0 2px; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--accent) !important; color: white !important; border-color: var(--accent) !important; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--bg3) !important; color: var(--text) !important; }
+        table.dataTable { border-collapse: collapse !important; }
+        @media (max-width: 900px) {
+            .sidebar { width: 60px; }
+            .sidebar .nav-item span:not(.nav-icon) { display: none; }
+            .sidebar-logo span { display: none; }
+            .sidebar-footer { display: none; }
+            .main-content { margin-left: 60px; padding: 20px 16px; }
+            .stat-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<nav th:fragment="sidebar" class="sidebar">
+    <a class="sidebar-logo" href="/strategies"><div class="logo-dot"></div><span>T-Bank Trading</span></a>
+    <a class="nav-item" th:classappend="${reportStrategiesInfo != null} ? 'active'" href="/strategies">
+        <span class="nav-icon">&#9672;</span><span>Стратегии</span>
+    </a>
+    <a class="nav-item" th:classappend="${orders != null} ? 'active'" href="/orders">
+        <span class="nav-icon">&#8644;</span><span>Операции</span>
+    </a>
+    <a class="nav-item" th:classappend="${reportInstrumentByFiat != null} ? 'active'" href="/instrument_by_fiat">
+        <span class="nav-icon">&#9636;</span><span>Инструмент / фиат</span>
+    </a>
+    <a class="nav-item" th:classappend="${reportInstrumentByInstrument != null} ? 'active'" href="/instrument_by_instrument">
+        <span class="nav-icon">&#8646;</span><span>Инструмент / инструмент</span>
+    </a>
+    <div class="sidebar-footer">
+        Sandbox mode<br>
+        <span style="color: var(--green);">&#9679; </span>Подключен
+    </div>
+</nav>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/general.html :: head}"/>
+<body>
+<nav th:replace="~{fragments/general.html :: sidebar}"/>
+<div class="main-content">
+    <div class="page-title">Доходность: инструмент за фиат</div>
+    <div class="page-sub">Сравнение доходности робота и стратегии «купи и держи», с учетом комиссий</div>
+
+    <div class="tbl-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Инструмент</th>
+                <th>Стратегия</th>
+                <th>Доход робота, %</th>
+                <th>Доход «купи и держи», %</th>
+                <th>Сделок</th>
+                <th>Первая цена</th>
+                <th>Текущая цена</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r: ${reportInstrumentByFiat}" th:style="${!r.strategyIsEnabled} ? 'opacity: 0.5'">
+                <td style="font-weight:500" th:text="${r.figiTitle}"/>
+                <td>
+                    <span th:text="${r.strategyName}"/>
+                    <span class="badge-status badge-off" style="margin-left:6px" th:if="${!r.strategyIsEnabled}">off</span>
+                </td>
+                <td th:classappend="${r.profitByRobot >= 0} ? 'text-pos' : 'text-neg'"
+                    style="font-weight:500"
+                    th:text="${(r.profitByRobot >= 0 ? '+' : '') + #numbers.formatDecimal(r.profitByRobot, 1, 2, 'DEFAULT')}"/>
+                <td th:classappend="${r.profitByInvest >= 0} ? 'text-pos' : 'text-neg'"
+                    th:text="${(r.profitByInvest >= 0 ? '+' : '') + #numbers.formatDecimal(r.profitByInvest, 1, 2, 'DEFAULT')}"/>
+                <td th:text="${r.orders}"/>
+                <td th:text="${#numbers.formatDecimal(r.firstPrice, 1, 4, 'DEFAULT')}"/>
+                <td th:text="${#numbers.formatDecimal(r.lastPrice, 1, 4, 'DEFAULT')}"/>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
