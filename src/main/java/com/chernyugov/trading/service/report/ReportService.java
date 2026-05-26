@@ -9,6 +9,7 @@ import com.chernyugov.trading.service.dictionary.InstrumentService;
 import com.chernyugov.trading.strategy.AStrategy;
 import com.chernyugov.trading.strategy.StrategySelector;
 import com.chernyugov.trading.strategy.instrument_by_instrument.AInstrumentByInstrumentStrategy;
+import com.chernyugov.trading.service.strategy.ConfigurableInstrumentByFiatStrategy;
 import com.chernyugov.trading.strategy.mean_reversion_strategy.AInstrumentByFiatStrategy;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -61,6 +62,8 @@ public class ReportService {
                             .history(s instanceof AInstrumentByFiatStrategy ? ((AInstrumentByFiatStrategy) s).getHistoryDuration() : null)
                             .dropPercent(s instanceof AInstrumentByInstrumentStrategy ? ((AInstrumentByInstrumentStrategy) s).getMinimalDropPercent() : null)
                             .isOnlySell(s.isOnlySell())
+                            .configurable(s instanceof ConfigurableInstrumentByFiatStrategy)
+                            .configId(s instanceof ConfigurableInstrumentByFiatStrategy ? ((ConfigurableInstrumentByFiatStrategy) s).getConfigId() : null)
                             .build();
                 })
                 .sorted(Comparator.comparing(StrategyInfoReportRow::getName))

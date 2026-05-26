@@ -7,6 +7,10 @@
     <div class="page-title">Торговые стратегии</div>
     <div class="page-sub">Настроенные стратегии и их параметры</div>
 
+    <div style="margin-bottom:16px">
+        <a href="/strategies/create" class="btn btn-sm" style="background:var(--accent);color:white;border-radius:6px;padding:7px 12px;text-decoration:none">+ Создать стратегию</a>
+    </div>
+
     <div class="stat-cards">
         <div class="stat-card">
             <div class="stat-label">Всего стратегий</div>
@@ -35,6 +39,7 @@
                 <th>Инструменты</th>
                 <th>Условия</th>
                 <th>Статус</th>
+                <th>Действия</th>
             </tr>
             </thead>
             <tbody>
@@ -71,6 +76,12 @@
                     <span class="badge-status badge-on" th:if="${s.isEnabled && !s.isOnlySell}">Активна</span>
                     <span class="badge-status badge-off" th:if="${!s.isEnabled}">Выключена</span>
                     <span class="badge-status" style="background:rgba(245,158,11,0.15);color:var(--amber);" th:if="${s.isEnabled && s.isOnlySell}">Только продажа</span>
+                    <span class="tag" style="margin-left:6px" th:if="${s.configurable}">из БД</span>
+                    <span class="tag" style="margin-left:6px" th:if="${!s.configurable}">код</span>
+                </td>
+                <td>
+                    <a th:if="${s.configurable}" th:href="@{/strategies/{id}/edit(id=${s.configId})}" class="tag" style="text-decoration:none;color:var(--text)">редактировать</a>
+                    <span th:if="${!s.configurable}" class="text-muted2">—</span>
                 </td>
             </tr>
             </tbody>
