@@ -25,7 +25,7 @@ public abstract class AInstrumentByFiatStrategy extends AStrategy {
      * @return
      */
     public Duration getHistoryDuration() {
-        return Duration.ofDays(14);
+        return Duration.ofDays(3);
     }
 
     @Builder

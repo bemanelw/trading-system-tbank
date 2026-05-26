@@ -3,6 +3,7 @@ package com.chernyugov.trading.strategy.instrument_by_instrument;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Component
@@ -19,7 +20,17 @@ public class EURByCNYStrategy extends AInstrumentByInstrumentStrategy {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
+    }
+
+    @Override
+    public float getMinimalDropPercent() {
+        return 0.05f;
+    }
+
+    @Override
+    public Duration getForceToSellDuration() {
+        return Duration.ofMinutes(30);
     }
 }
 
