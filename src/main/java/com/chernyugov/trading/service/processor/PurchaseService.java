@@ -3,6 +3,8 @@ package com.chernyugov.trading.service.processor;
 import com.chernyugov.trading.entity.CandleDomainEntity;
 import com.chernyugov.trading.entity.OrderDomainEntity;
 import com.chernyugov.trading.service.order.OrderService;
+import com.chernyugov.trading.service.liquidity.LiquidityGuardService;
+import com.chernyugov.trading.service.liquidity.TradeSide;
 import com.chernyugov.trading.service.price.PricesService;
 import com.chernyugov.trading.strategy.AStrategy;
 import com.chernyugov.trading.strategy.StrategySelector;
@@ -27,6 +29,7 @@ public class PurchaseService {
     private final StrategySelector strategySelector;
     private final CalculatorFacade calculator;
     private final PricesService pricesService;
+    private final LiquidityGuardService liquidityGuardService;
 
     /**
      * Обработчик новой свечи по всем стратегиям
@@ -100,6 +103,13 @@ public class PurchaseService {
             }
         }
 
+        // Проверяем ликвидность перед отправкой заявки
+        var liquidityDecision = liquidityGuardService.check(candle, strategy, TradeSide.BUY);
+        if (!liquidityDecision.isAllowed()) {
+            log.warn("Buy blocked by Liquidity Guard: {}, {}, reason: {}", candle.getFigi(), strategy.getName(), liquidityDecision.getReason());
+            return;
+        }
+
         // Покупаем
         var order = orderService.buy(candle, strategy);
         var msg = String.format("Buy %s (%s), %s x%s, %s, %s. Wanted %s", order.getFigi(),
@@ -126,6 +136,13 @@ public class PurchaseService {
         // Рассчитываем, нужно ли продавать
         var isShouldSell = calculator.isShouldSell(strategy, candle, order.getPurchasePrice());
         if (!isShouldSell) {
+            return;
+        }
+
+        // Проверяем ликвидность перед отправкой заявки
+        var liquidityDecision = liquidityGuardService.check(candle, strategy, TradeSide.SELL);
+        if (!liquidityDecision.isAllowed()) {
+            log.warn("Sell blocked by Liquidity Guard: {}, {}, reason: {}", candle.getFigi(), strategy.getName(), liquidityDecision.getReason());
             return;
         }
 

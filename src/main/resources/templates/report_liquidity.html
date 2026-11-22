@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/general.html :: head}"/>
+<body>
+<nav th:replace="~{fragments/general.html :: sidebar}"/>
+<div class="main-content">
+    <div class="page-title">Liquidity Guard</div>
+    <div class="page-sub">Предторговая проверка стакана: спред, проскальзывание и доступный объем перед отправкой заявки</div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-label">Проверок</div>
+            <div class="stat-value" th:text="${#lists.size(liquidityEvents)}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Разрешено</div>
+            <div class="stat-value pos" th:text="${#lists.size(liquidityEvents.?[allowed])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Заблокировано</div>
+            <div class="stat-value neg" th:text="${#lists.size(liquidityEvents.?[!allowed])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Стратегий</div>
+            <div class="stat-value" th:text="${#sets.size(liquidityEvents.![strategy])}">0</div>
+        </div>
+    </div>
+
+    <div class="tbl-wrap">
+        <table id="liquidity-table" style="width:100%">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Дата</th>
+                <th>Статус</th>
+                <th>Сторона</th>
+                <th>Инструмент</th>
+                <th>Стратегия</th>
+                <th>Причина</th>
+                <th>Цена свечи</th>
+                <th>Bid / Ask</th>
+                <th>Спред, %</th>
+                <th>Скольжение, %</th>
+                <th>Объем</th>
+            </tr>
+            </thead>
+            <tbody id="liquidity-table-body">
+            <tr th:each="e: ${liquidityEvents}">
+                <td th:text="${e.id}"/>
+                <td th:text="${#temporals.formatISO(e.eventDateTime)}"/>
+                <td>
+                    <span class="badge-status badge-on" th:if="${e.allowed}">allowed</span>
+                    <span class="badge-status" style="background:rgba(239,68,68,0.15);color:var(--red);" th:if="${!e.allowed}">blocked</span>
+                </td>
+                <td th:text="${e.side}"/>
+                <td style="font-weight:500" th:text="${e.figiTitle}"/>
+                <td th:text="${e.strategy}"/>
+                <td th:text="${e.reason}"/>
+                <td th:text="${e.expectedPrice == null ? '—' : #numbers.formatDecimal(e.expectedPrice, 1, 4, 'DEFAULT')}"/>
+                <td th:text="${(e.bestBid == null ? '—' : #numbers.formatDecimal(e.bestBid, 1, 4, 'DEFAULT')) + ' / ' + (e.bestAsk == null ? '—' : #numbers.formatDecimal(e.bestAsk, 1, 4, 'DEFAULT'))}"/>
+                <td th:text="${e.spreadPercent == null ? '—' : #numbers.formatDecimal(e.spreadPercent, 1, 4, 'DEFAULT')}"/>
+                <td th:text="${e.slippagePercent == null ? '—' : #numbers.formatDecimal(e.slippagePercent, 1, 4, 'DEFAULT')}"/>
+                <td th:text="${e.availableLots == null ? '—' : e.availableLots + ' / ' + e.requiredLots}"/>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        new DataTable('#liquidity-table', {
+            pageLength: 50,
+            lengthChange: false,
+            info: false,
+            order: [ [0, 'desc'] ],
+            language: {
+                search: "Поиск:",
+                paginate: { previous: "←", next: "→" }
+            }
+        });
+    });
+    $('#liquidity-table-body td:nth-child(2)').each(function () {
+        var dateString = $(this).text();
+        if (dateString && dateString !== '—') {
+            var date = new Date(dateString);
+            $(this).text(date.toLocaleString([], {dateStyle: "short", timeStyle: 'short'}));
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/general.html :: head}"/>
+<body>
+<nav th:replace="~{fragments/general.html :: sidebar}"/>
+<div class="main-content">
+    <div class="page-title" th:text="${isNew} ? 'Создание стратегии' : 'Редактирование стратегии'">Стратегия</div>
+    <div class="page-sub">Конструктор параметрической стратегии: инструмент, перцентиль входа, TP/SL и параметры Liquidity Guard</div>
+
+    <form th:object="${strategyConfig}" th:action="${isNew} ? @{/strategies} : @{/strategies/{id}(id=${strategyConfig.id})}" method="post">
+        <div class="tbl-wrap" style="padding:18px;max-width:900px">
+            <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" th:field="*{type}"/>
+            <input type="hidden" th:field="*{version}"/>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Название стратегии</label>
+                    <input class="form-control" th:field="*{name}" placeholder="Aeroflot P10 TP1 SL3" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">FIGI инструмента</label>
+                    <input class="form-control" th:field="*{figi}" placeholder="BBG004S683W7" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Количество</label>
+                    <input class="form-control" type="number" min="1" th:field="*{count}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">История, дней</label>
+                    <input class="form-control" type="number" min="1" th:field="*{historyDays}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Покупка ниже перцентиля</label>
+                    <input class="form-control" type="number" min="0" max="100" th:field="*{buyPercentile}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Статус</label>
+                    <div style="padding-top:7px">
+                        <label style="margin-right:14px"><input type="checkbox" th:field="*{enabled}"> включена</label>
+                        <label><input type="checkbox" th:field="*{onlySell}"> только продажа</label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Take-profit, %</label>
+                    <input class="form-control" type="number" step="0.01" min="0" th:field="*{takeProfitPercent}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Stop-loss, %</label>
+                    <input class="form-control" type="number" step="0.01" min="0" th:field="*{stopLossPercent}">
+                </div>
+            </div>
+
+            <hr style="border-color:var(--border);margin:22px 0">
+            <div class="page-title" style="font-size:16px;margin-bottom:12px">Liquidity Guard</div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Проверять ликвидность</label>
+                    <div style="padding-top:7px"><input type="checkbox" th:field="*{liquidityGuardEnabled}"> включено</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Макс. спред, %</label>
+                    <input class="form-control" type="number" step="0.01" min="0" th:field="*{maxSpreadPercent}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Макс. проскальзывание, %</label>
+                    <input class="form-control" type="number" step="0.01" min="0" th:field="*{maxSlippagePercent}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Мин. лотов в стакане</label>
+                    <input class="form-control" type="number" min="0" th:field="*{minAvailableLots}" placeholder="автоматически">
+                </div>
+            </div>
+
+            <div style="margin-top:22px;display:flex;gap:10px;align-items:center">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a href="/strategies" class="btn btn-outline-light">Отмена</a>
+            </div>
+        </div>
+    </form>
+
+    <form th:if="${!isNew}" th:action="@{/strategies/{id}/delete(id=${strategyConfig.id})}" method="post" style="margin-top:12px">
+        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить стратегию?')">Удалить стратегию</button>
+    </form>
+</div>
+</body>
+</html>

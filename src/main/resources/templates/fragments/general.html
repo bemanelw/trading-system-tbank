@@ -86,6 +86,9 @@
     <a class="nav-item" th:classappend="${orders != null} ? 'active'" href="/orders">
         <span class="nav-icon">&#8644;</span><span>Операции</span>
     </a>
+    <a class="nav-item" th:classappend="${liquidityEvents != null} ? 'active'" href="/liquidity">
+        <span class="nav-icon">&#128737;</span><span>Liquidity Guard</span>
+    </a>
     <a class="nav-item" th:classappend="${reportInstrumentByFiat != null} ? 'active'" href="/instrument_by_fiat">
         <span class="nav-icon">&#9636;</span><span>Инструмент / фиат</span>
     </a>

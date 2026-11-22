@@ -14,7 +14,7 @@ services:
       - tinkoff.emulator=false
       - tinkoff.is-token-sandbox=true
       - tinkoff.token=${TINKOFF_TOKEN_SANDBOX}
-      - tinkoff.account-id=415b7f7e-a91a-4e07-af0a-7097ed0c2fa6
+      - tinkoff.account-id=d304a529-2cd2-4c93-8882-40848f0f7270
     restart: always
     deploy:
       resources:

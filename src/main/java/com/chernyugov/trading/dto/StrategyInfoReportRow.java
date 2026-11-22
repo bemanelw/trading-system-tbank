@@ -23,4 +23,6 @@ public class StrategyInfoReportRow {
     private Duration history;
     private Float dropPercent;
     private Boolean isOnlySell;
+    private Long configId;
+    private boolean configurable;
 }

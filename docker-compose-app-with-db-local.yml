@@ -28,5 +28,5 @@ services:
       - tinkoff.emulator=false
       - tinkoff.is-token-sandbox=true
       - tinkoff.token=t.50qS2BllZykHKgTuyKficSFACgXZLGlMhHcY2BbF8wN9hLqeBGP_9xhdYjgcQVV37bQDpodCCd_hNckwIbO_8g
-      - tinkoff.account-id=bc8ba504-bc5a-4d42-8d28-fe88eb51c8b2 #песочница
+      - tinkoff.account-id=d304a529-2cd2-4c93-8882-40848f0f7270 #песочница
 
